@@ -17,6 +17,7 @@ public class CColonie implements Runnable {
   private Vector<CFourmi> mColonie;
   private PaintingAnts mApplis;
   private int nbIterations = 0;
+  private static final int MAX_ITERATIONS = 100000;
 
   /** Creates a new instance of CColonie */
   public CColonie(Vector<CFourmi> pColonie, PaintingAnts pApplis) {
@@ -31,7 +32,7 @@ public class CColonie implements Runnable {
   @Override
   public void run() {
 
-    while (mContinue == true && nbIterations < 100000) {
+    while (mContinue == true && nbIterations < MAX_ITERATIONS) {
       if (!mApplis.getPause()) {
         for (int i = 0; i < mColonie.size(); i++) {
           mColonie.get(i).deplacer();
