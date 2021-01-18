@@ -303,9 +303,10 @@ public class CPainting extends Canvas implements MouseListener {
     }
   }
 
+
   /******************************************************************************
-   * Titre : void colorer_case(int x, int y, Color c) Description : Cette
-   * fonction va colorer le pixel correspondant et mettre a jour le tabmleau des
+   * Titre : void setCouleur(int x, int y, int pTaille) Description : Cette
+   * fonction va colorer le pixel correspondant et mettre a jour le tableau des
    * couleurs
    ******************************************************************************/
   public void setCouleur(int x, int y, Color c, int pTaille) {
@@ -412,13 +413,13 @@ public class CPainting extends Canvas implements MouseListener {
           }
           break;
       }// end switch
+
     }
   }
 
   /******************************************************************************
-   * Titre : setSupendu Description : Cette fonction change l'état de suspension
+   * Titre : suspendre Description : Cette fonction change l'état de suspension
    ******************************************************************************/
-
   public void suspendre() {
     mSuspendu = !mSuspendu;
     if (!mSuspendu) {
