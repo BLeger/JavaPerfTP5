@@ -483,12 +483,16 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
       }
       showStatus(lMessage);
+      if (!mThreadColony.isAlive()) {
+    	  stop();
+    	  System.exit(0);
+      }
 
-      try {
+      /*try {
         Thread.sleep(10);
       } catch (InterruptedException e) {
         showStatus(e.toString());
-      }
+      }*/
     }
   }
 

@@ -238,35 +238,25 @@ public class CPainting extends Canvas implements MouseListener {
   }
 
   public float[][] getMatriceFlou(int size) {
-	  float[][] matriceFlou = CPainting.mMatriceConv9;
-	  switch (size) {
-	  case 5:
-		  matriceFlou = CPainting.mMatriceConv25;
-		  break;
-	  case 7:
-		  matriceFlou = CPainting.mMatriceConv49;
-		  break;
-	  default:
-		  break;
+	  if (size == 3) {
+		  return CPainting.mMatriceConv9;
 	  }
-
-	  return matriceFlou;
+	  if (size == 5) {
+		  return CPainting.mMatriceConv25;
+	  }
+	  
+	  return CPainting.mMatriceConv49;
   }
   
   public int getCoeffConvolution(int size) {
-	  int coeff = 1;
-	  switch (size) {
-	  case 5:
-		  coeff = 2;
-		  break;
-	  case 7:
-		  coeff = 3;
-		  break;
-	  default:
-		  break;
+	  if (size == 3) {
+		  return 1;
 	  }
-
-	  return coeff;
+	  if (size == 5) {
+		  return 2;
+	  }
+	  
+	  return 3;
   }
   
   public void convolution(int x, int y, int size) {
@@ -304,10 +294,9 @@ public class CPainting extends Canvas implements MouseListener {
 	  }
   }
   
-  
   /******************************************************************************
-   * Titre : void colorer_case(int x, int y, Color c) Description : Cette
-   * fonction va colorer le pixel correspondant et mettre a jour le tabmleau des
+   * Titre : void setCouleur(int x, int y, int pTaille) Description : Cette
+   * fonction va colorer le pixel correspondant et mettre a jour le tableau des
    * couleurs
    ******************************************************************************/
   public void setCouleur(int x, int y, Color c, int pTaille) {
@@ -321,31 +310,15 @@ public class CPainting extends Canvas implements MouseListener {
 
       mCouleurs[x][y] = c;
 
-      // on fait diffuser la couleur :
-      switch (pTaille) {
-        case 0:
-          // on ne fait rien = pas de diffusion
-          break;
-        case 1:
-          // produit de convolution discrete sur 9 cases
-        	convolution(x, y, 3);
-        	break;
-        case 2:
-          // produit de convolution discrete sur 25 cases
-        	convolution(x, y, 5);
-        	break;
-        case 3:
-          // produit de convolution discrete sur 49 cases
-        	convolution(x, y, 7);
-        	break;
-      }// end switch
+      if (pTaille != 0) {
+    	  convolution(x, y, pTaille * 2 + 1);
+      }
     }
   }
 
   /******************************************************************************
-   * Titre : setSupendu Description : Cette fonction change l'état de suspension
+   * Titre : suspendre Description : Cette fonction change l'état de suspension
    ******************************************************************************/
-
   public void suspendre() {
     mSuspendu = !mSuspendu;
     if (!mSuspendu) {
