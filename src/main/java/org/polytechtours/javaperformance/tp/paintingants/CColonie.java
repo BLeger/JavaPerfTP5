@@ -17,7 +17,7 @@ public class CColonie implements Runnable {
   private Vector<CFourmi> mColonie;
   private PaintingAnts mApplis;
   private int nbIterations = 0;
-  private static final int MAX_ITERATIONS = 100000;
+  private static final int MAX_ITERATIONS = 10000;
 
   /** Creates a new instance of CColonie */
   public CColonie(Vector<CFourmi> pColonie, PaintingAnts pApplis) {

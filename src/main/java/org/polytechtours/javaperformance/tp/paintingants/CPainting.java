@@ -11,6 +11,9 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <p>
@@ -87,9 +90,9 @@ public class CPainting extends Canvas implements MouseListener {
   // tableau des couleurs, il permert de conserver en memoire l'état de chaque
   // pixel du canvas, ce qui est necessaire au deplacemet des fourmi
   // il sert aussi pour la fonction paint du Canvas
-  private Color[][] mCouleurs;
+  private List<Color> concurrentColors = new ArrayList<Color>(); 
   // couleur du fond
-  private Color mCouleurFond = new Color(255, 255, 255);
+  private static final Color mCouleurFond = new Color(255, 255, 255);
   // dimensions
   private Dimension mDimension = new Dimension();
 
@@ -101,36 +104,32 @@ public class CPainting extends Canvas implements MouseListener {
    * Titre : public CPainting() Description : Constructeur de la classe
    ******************************************************************************/
   public CPainting(Dimension pDimension, PaintingAnts pApplis) {
-    int i, j;
-    addMouseListener(this);
+	  addMouseListener(this);
 
-    mApplis = pApplis;
+	  mApplis = pApplis;
 
-    mDimension = pDimension;
-    setBounds(new Rectangle(0, 0, mDimension.width, mDimension.height));
+	  mDimension = pDimension;
+	  setBounds(new Rectangle(0, 0, mDimension.width, mDimension.height));
 
-    this.setBackground(mCouleurFond);
-
-    // initialisation de la matrice des couleurs
-    mCouleurs = new Color[mDimension.width][mDimension.height];
-    synchronized (mMutexCouleurs) {
-      for (i = 0; i != mDimension.width; i++) {
-        for (j = 0; j != mDimension.height; j++) {
-          mCouleurs[i][j] = new Color(mCouleurFond.getRed(), mCouleurFond.getGreen(), mCouleurFond.getBlue());
-        }
-      }
-    }
-
+	  this.setBackground(mCouleurFond);
+	  // initialisation de la matrice des couleurs
+   	  for (int j = 0; j != mDimension.height; j++) {
+   		  for (int i = 0; i != mDimension.width; i++) {
+   			  concurrentColors.add(new Color(mCouleurFond.getRed(), mCouleurFond.getGreen(), mCouleurFond.getBlue()));
+   		  }
+   	  }
   }
 
   /******************************************************************************
    * Titre : Color getCouleur Description : Cette fonction renvoie la couleur
    * d'une case
    ******************************************************************************/
-  public Color getCouleur(int x, int y) {
-    synchronized (mMutexCouleurs) {
-      return mCouleurs[x][y];
-    }
+  public Color getCurrentCouleur(int x, int y) {
+	  return concurrentColors.get(y * mDimension.width + x);
+  }
+  
+  public void setCurrentCouleur(int x, int y, Color c) {
+	  concurrentColors.set(y * mDimension.width + x, c);
   }
 
   /******************************************************************************
@@ -162,18 +161,16 @@ public class CPainting extends Canvas implements MouseListener {
    * et initialise le tableau des couleurs avec la couleur blanche
    ******************************************************************************/
   public void init() {
-    int i, j;
     mGraphics = getGraphics();
     synchronized (mMutexCouleurs) {
       mGraphics.clearRect(0, 0, mDimension.width, mDimension.height);
 
       // initialisation de la matrice des couleurs
-
-      for (i = 0; i != mDimension.width; i++) {
-        for (j = 0; j != mDimension.height; j++) {
-          mCouleurs[i][j] = new Color(mCouleurFond.getRed(), mCouleurFond.getGreen(), mCouleurFond.getBlue());
-        }
-      }
+   	  for (int j = 0; j != mDimension.height; j++) {
+   		  for (int i = 0; i != mDimension.width; i++) {
+   			  concurrentColors.add(new Color(mCouleurFond.getRed(), mCouleurFond.getGreen(), mCouleurFond.getBlue()));
+   		  }
+   	  }
     }
 
     mSuspendu = false;
@@ -230,7 +227,7 @@ public class CPainting extends Canvas implements MouseListener {
     synchronized (mMutexCouleurs) {
       for (i = 0; i < mDimension.width; i++) {
         for (j = 0; j < mDimension.height; j++) {
-          pGraphics.setColor(mCouleurs[i][j]);
+          pGraphics.setColor(getCurrentCouleur(i, j));
           pGraphics.fillRect(i, j, 1, 1);
         }
       }
@@ -275,9 +272,10 @@ public class CPainting extends Canvas implements MouseListener {
 				  for (int l = 0; l < size; l++) {
 					  m = (x + i + k - (coeff * 2) + mDimension.width) % mDimension.width;
 					  n = (y + j + l - (coeff * 2) + mDimension.height) % mDimension.height;
-					  R += matriceFlou[k][l] * mCouleurs[m][n].getRed();
-					  G += matriceFlou[k][l] * mCouleurs[m][n].getGreen();
-					  B += matriceFlou[k][l] * mCouleurs[m][n].getBlue();
+					  Color color = getCurrentCouleur(m, n);
+					  R += matriceFlou[k][l] * color.getRed();
+					  G += matriceFlou[k][l] * color.getGreen();
+					  B += matriceFlou[k][l] * color.getBlue();
 				  }
 			  }
 			  lColor = new Color((int) R, (int) G, (int) B);
@@ -286,7 +284,7 @@ public class CPainting extends Canvas implements MouseListener {
 
 			  m = (x + i - coeff + mDimension.width) % mDimension.width;
 			  n = (y + j - coeff + mDimension.height) % mDimension.height;
-			  mCouleurs[m][n] = lColor;
+			  setCurrentCouleur(m, n, lColor);
 			  if (!mSuspendu) {
 				  mGraphics.fillRect(m, n, 1, 1);
 			  }
@@ -308,7 +306,7 @@ public class CPainting extends Canvas implements MouseListener {
         mGraphics.fillRect(x, y, 1, 1);
       }
 
-      mCouleurs[x][y] = c;
+      setCurrentCouleur(x, y, c);
 
       if (pTaille != 0) {
     	  convolution(x, y, pTaille * 2 + 1);
