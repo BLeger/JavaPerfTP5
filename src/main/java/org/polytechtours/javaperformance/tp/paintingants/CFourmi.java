@@ -11,6 +11,7 @@ public class CFourmi {
   static private int[][] mIncDirection = new int[8][2];
   // le generateur aléatoire (Random est thread safe donc on la partage)
   private static Random GenerateurAleatoire = new Random();
+
   // couleur déposé par la fourmi
   private Color mCouleurDeposee;
   private float mLuminanceCouleurSuivie;
@@ -114,7 +115,7 @@ public class CFourmi {
     } else {
       lCouleur = new Color(mPainting.getCouleur(i, j).getRGB());
     }
-    if (testCouleur(lCouleur)) {
+    if (testCouleur(lCouleur, mLuminanceCouleurSuivie, mSeuilLuminance)) {
       dir[0] = 1;
     }
 
@@ -125,7 +126,7 @@ public class CFourmi {
     } else {
       lCouleur = new Color(mPainting.getCouleur(i, j).getRGB());
     }
-    if (testCouleur(lCouleur)) {
+    if (testCouleur(lCouleur,mLuminanceCouleurSuivie, mSeuilLuminance )) {
       dir[1] = 1;
     }
     i = modulo(x + CFourmi.mIncDirection[modulo(mDirection + mDecalDir, 8)][0], mPainting.getLargeur());
@@ -135,7 +136,7 @@ public class CFourmi {
     } else {
       lCouleur = new Color(mPainting.getCouleur(i, j).getRGB());
     }
-    if (testCouleur(lCouleur)) {
+    if (testCouleur(lCouleur,mLuminanceCouleurSuivie, mSeuilLuminance )) {
       dir[2] = 1;
     }
 
@@ -221,7 +222,7 @@ public class CFourmi {
    * d'une couleur avec la couleur suivie
    *
    */
-  private boolean testCouleur(Color pCouleur) {
+  static boolean testCouleur(Color pCouleur, Float mLuminanceCouleurSuivie, Float mSeuilLuminance) {
     boolean lReponse = false;
     float lLuminance;
 
@@ -230,6 +231,7 @@ public class CFourmi {
 
     /* test */
     if (Math.abs(mLuminanceCouleurSuivie - lLuminance) < mSeuilLuminance) {
+
       lReponse = true;
       // System.out.print(x);
     }
