@@ -44,7 +44,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 	/** stocke la valeur du compteur lors du dernier timer */
 	private Long lastFps = 0L;
 
-	
+
 	/****************************************************************************/
 	/**
 	 * incrémenter le compteur
@@ -125,7 +125,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
 		mPainting = new CPainting(mDimension, this);
 		add(mPainting);
-		
+
 		mFourmisThreads = new ArrayList<>();
 
 		// lecture de l'image
@@ -188,7 +188,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 		String seuilLuminance = getParameter("SeuilLuminance");
 		String fourmis = getParameter("Fourmis");
 		String nbFourmis = getParameter("NbFourmis");
-		
+
 		mColonie = new ColonieBuilder().readParameterFourmis(seuilLuminance, fourmis, nbFourmis, mPainting, this);
 	}
 
@@ -207,14 +207,14 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 		mPainting.init();
 
 		Thread currentThread = Thread.currentThread();
-		
+
 		for (CFourmi fourmi : mColonie) {
 			Thread thread = new Thread(fourmi);
 			mFourmisThreads.add(thread);
 			thread.start();
 		}
 		mAliveFourmis = new AtomicInteger(mColonie.size());
-	
+
 		while (mApplis == currentThread) {
 			if (mPause) {
 				lMessage = "pause";
@@ -236,12 +236,13 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 				stop();
 				System.exit(0);
 			}
-
-			/*try {
-        Thread.sleep(10);
-      } catch (InterruptedException e) {
-        showStatus(e.toString());
-      }*/
+			
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -254,8 +255,8 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 	public void start() {
 		// System.out.println(this.getName()+ ":start()");
 		//mColony = new CColonie(mColonie, this);
-//		mThreadColony = new Thread(mColony);
-//		mThreadColony.setPriority(Thread.MIN_PRIORITY);
+		//		mThreadColony = new Thread(mColony);
+		//		mThreadColony.setPriority(Thread.MIN_PRIORITY);
 
 		fpsTimer = new Timer(1000, new ActionListener() {
 			@Override
@@ -290,7 +291,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 		for (CFourmi fourmi : mColonie) {
 			fourmi.stop();
 		}
-		
+
 		mApplis = null;
 	}
 
@@ -301,7 +302,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 		lastFps = fpsCounter;
 		fpsCounter = 0L;
 	}
-	
+
 	public void fourmiDied() {
 		mAliveFourmis.decrementAndGet();
 	}
