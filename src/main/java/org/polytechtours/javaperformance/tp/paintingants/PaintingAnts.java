@@ -1,6 +1,5 @@
 package org.polytechtours.javaperformance.tp.paintingants;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -8,9 +7,12 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.StringTokenizer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.sound.sampled.LineListener;
 import javax.swing.Timer;
 
 public class PaintingAnts extends java.applet.Applet implements Runnable {
@@ -24,9 +26,10 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
 	// les fourmis
 	private Vector<CFourmi> mColonie;
-	private CColonie mColony;
+	private List<Thread> mFourmisThreads;
+	private AtomicInteger mAliveFourmis;
 
-	private Thread mApplis, mThreadColony;
+	private Thread mApplis;
 
 	private Dimension mDimension;
 	private long mCompteur = 0;
@@ -41,6 +44,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 	/** stocke la valeur du compteur lors du dernier timer */
 	private Long lastFps = 0L;
 
+	
 	/****************************************************************************/
 	/**
 	 * incrémenter le compteur
@@ -121,6 +125,8 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
 		mPainting = new CPainting(mDimension, this);
 		add(mPainting);
+		
+		mFourmisThreads = new ArrayList<>();
 
 		// lecture de l'image
 		lFileName = urlLoader.findResource("images/" + getParameter("Img"));
@@ -201,9 +207,14 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 		mPainting.init();
 
 		Thread currentThread = Thread.currentThread();
-
-		mThreadColony.start();
-
+		
+		for (CFourmi fourmi : mColonie) {
+			Thread thread = new Thread(fourmi);
+			mFourmisThreads.add(thread);
+			thread.start();
+		}
+		mAliveFourmis = new AtomicInteger(mColonie.size());
+	
 		while (mApplis == currentThread) {
 			if (mPause) {
 				lMessage = "pause";
@@ -221,7 +232,7 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 
 			}
 			showStatus(lMessage);
-			if (!mThreadColony.isAlive()) {
+			if (mAliveFourmis.get() == 0) {
 				stop();
 				System.exit(0);
 			}
@@ -242,9 +253,9 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 	@Override
 	public void start() {
 		// System.out.println(this.getName()+ ":start()");
-		mColony = new CColonie(mColonie, this);
-		mThreadColony = new Thread(mColony);
-		mThreadColony.setPriority(Thread.MIN_PRIORITY);
+		//mColony = new CColonie(mColonie, this);
+//		mThreadColony = new Thread(mColony);
+//		mThreadColony.setPriority(Thread.MIN_PRIORITY);
 
 		fpsTimer = new Timer(1000, new ActionListener() {
 			@Override
@@ -275,13 +286,11 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 		fpsTimer.stop();
 
 		// On demande au Thread Colony de s'arreter et on attend qu'il s'arrete
-		mColony.pleaseStop();
-		try {
-			mThreadColony.join();
-		} catch (Exception e) {
-		}
 
-		mThreadColony = null;
+		for (CFourmi fourmi : mColonie) {
+			fourmi.stop();
+		}
+		
 		mApplis = null;
 	}
 
@@ -291,5 +300,9 @@ public class PaintingAnts extends java.applet.Applet implements Runnable {
 	private synchronized void updateFPS() {
 		lastFps = fpsCounter;
 		fpsCounter = 0L;
+	}
+	
+	public void fourmiDied() {
+		mAliveFourmis.decrementAndGet();
 	}
 }

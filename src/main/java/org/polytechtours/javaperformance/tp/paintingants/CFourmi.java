@@ -35,6 +35,8 @@ public class CFourmi implements Runnable {
 	private long mNbDeplacements;
 	
 	private static final int MAX_ITERATIONS = 10000;
+	
+	private boolean mStop = false;
 
 	/*************************************************************************************************
 	 */
@@ -242,8 +244,17 @@ public class CFourmi implements Runnable {
 	@Override
 	public void run() {
 		for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
+			if (mStop) {
+				break;
+			}
 			deplacer();
 			mApplis.compteur();
 		}
+		
+		mApplis.fourmiDied();
+	}
+	
+	public void stop() {
+		mStop = true;
 	}
 }
