@@ -269,7 +269,6 @@ public class CPainting extends Canvas implements MouseListener {
 			for (int i = 0; i < size; i++) {
 				for (int j = 0; j < size; j++) {
 					R = G = B = 0f;
-	
 					for (int k = 0; k < size; k++) {
 						for (int l = 0; l < size; l++) {
 							m = (x + i + k - (coeff * 2) + mDimension.width) % mDimension.width;
@@ -281,15 +280,10 @@ public class CPainting extends Canvas implements MouseListener {
 						}
 					}
 					lColor = new Color((int) R, (int) G, (int) B);
-	
-					//mGraphics.setColor(lColor);
-	
+					
 					m = (x + i - coeff + mDimension.width) % mDimension.width;
 					n = (y + j - coeff + mDimension.height) % mDimension.height;
 					setCurrentCouleur(m, n, lColor);
-					/*if (!mSuspendu) {
-					  mGraphics.fillRect(m, n, 1, 1);
-				  }*/
 				}
 			}
 		}
@@ -317,19 +311,12 @@ public class CPainting extends Canvas implements MouseListener {
 	public void setCouleur(int x, int y, Color c, int pTaille) {
 
 		synchronized (mMutexCouleurs) {
-			/*if (!mSuspendu) {
-        // on colorie la case sur laquelle se trouve la fourmi
-        mGraphics.setColor(c);
-        mGraphics.fillRect(x, y, 1, 1);
-      }*/
-
 			setCurrentCouleur(x, y, c);
 		}
 
 		if (pTaille != 0) {
 			convolution(x, y, pTaille * 2 + 1);
 		}
-
 	}
 
 	/******************************************************************************
