@@ -5,6 +5,11 @@ package org.polytechtours.javaperformance.tp.paintingants;
 import java.awt.Color;
 import java.util.Random;
 
+/** Cette classe représente une fourmis.
+ * Elle est lancée à l'aide d'un thread pour garantir une performance Java
+ * @author La Dream Team
+ * @version 4.1
+ */
 public class CFourmi implements Runnable {
 	// Tableau des incrémentations à effectuer sur la position des fourmis
 	// en fonction de la direction du deplacement
@@ -39,6 +44,7 @@ public class CFourmi implements Runnable {
 	private boolean mStop = false;
 
 	/*************************************************************************************************
+	 * Constructeur de la classe CFourmis
 	 */
 	public CFourmi(Color pCouleurDeposee, Color pCouleurSuivie, float pProbaTD, float pProbaG, float pProbaD,
 			float pProbaSuivre, CPainting pPainting, char pTypeDeplacement, float pInit_x, float pInit_y, int pInitDirection,
@@ -243,15 +249,22 @@ public class CFourmi implements Runnable {
 
 	@Override
 	public void run() {
-		for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
-			if (mStop) {
-				break;
+		if (MAX_ITERATIONS == -1){
+			while (!mStop){
+				deplacer();
+				mApplis.compteur();
 			}
-			deplacer();
-			mApplis.compteur();
+		}else{
+			for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
+				if (mStop) {
+					break;
+				}
+				deplacer();
+				mApplis.compteur();
+			}
+
+			mApplis.fourmiDied();
 		}
-		
-		mApplis.fourmiDied();
 	}
 	
 	public void stop() {

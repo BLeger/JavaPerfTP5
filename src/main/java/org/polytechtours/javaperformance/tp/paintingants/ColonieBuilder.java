@@ -4,6 +4,10 @@ import java.awt.Color;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+/** Cette classe représente une colonie de fourmis.
+ * @author La Dream Team
+ * @version 1.0
+ */
 public class ColonieBuilder {
 
 	// =========================================================================
@@ -58,6 +62,7 @@ public class ColonieBuilder {
 		}
 		return lResult;
 	}
+
 
 	public Vector<CFourmi> readParameterFourmis(String seuilLuminance, String fourmis, String nbFourmis, CPainting mPainting, PaintingAnts paintingAnts) {
 		String lChaine;
